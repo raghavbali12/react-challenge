@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { updateItem } from '../api/items';
 
 const Items = ({userId}) => {
     console.log("rerendering items ...")
@@ -6,14 +7,29 @@ const Items = ({userId}) => {
     const [showToast, setShowToast] = useState(null);
 
     
-    const onSubmit = () => {
+    const onSubmit = async () => {
         console.log("submitting items ...", items)
+        let itemArr = items.split(",");
+        let responseArr = await getResponses(itemArr);
+        console.log(itemArr);
+        
+        console.log(responseArr);
+        setShowToast(responseArr);
+    }
+
+    async function getResponses(itemArr) {
+        let responseArr = []
+        for (const item of itemArr) {
+            let response = await updateItem(item, userId);
+            responseArr.push(response);
+        }
+        return responseArr;
     }
 
     return (
         <>
             <div className="mt-8 flex items-center justify-center">
-                <input placeholder="enter items" value={items} class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"/>
+                <input placeholder="enter items" value={items} onChange={(e) => setItems(e.target.value)} class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"/>
             </div>
             <div className="mt-2">
                 <button onClick={()=> onSubmit()} className="w-full bg-slate-200 px-4 py-2 rounded-md" > Submit </button>
